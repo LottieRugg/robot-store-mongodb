@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 
 const MongoClient = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
@@ -7,7 +8,7 @@ const port = 3000
 const Schema = require('validate')
 
 app.use(express.json())
-
+app.use(cors())
 const url= 'mongodb://root:password@localhost:27017'
 
 const successMessage = 'The database request was successful'
@@ -124,6 +125,7 @@ app.post('/products', async (req, res) => {
         image3: req.body.image3
     }
     let errors = product.validate(dataToInsert)
+
     errors += productRequired.validate(dataToInsert)
 
 
@@ -196,4 +198,14 @@ app.delete('/products', async (req, res) => {
     }
 
 })
+
+app.get('/productcategory', async (req, res) => {
+    const connection = await MongoClient.connect(url)
+    const db = connection.db('robot_store')
+    const collection = db.collection('categories')
+    const data = await collection.find({}).toArray()
+    res.json(data)
+})
+
+
 app.listen(port)
